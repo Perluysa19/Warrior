@@ -2,10 +2,10 @@ import { connect } from '../config/db/connectMysql.js';
 
 class WarriorModel {
 
-  static async create({ warrior_name, warrior_level, race_id, warrior_type_id, magic_id, admin_id }) {
+  static async create({ warrior_name, race_id, warrior_type_id, magic_id, admin_id, warrior_image = null }) {
     const [result] = await connect.query(
-      'INSERT INTO warrior (Warrior_name, Warrior_level, Race_id, Warrior_type_id, Magic_id, Admin_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [warrior_name, warrior_level, race_id, warrior_type_id, magic_id, admin_id]
+      'INSERT INTO warrior (Warrior_name, Race_id, Warrior_type_id, Magic_id, Admin_id, Warrior_image) VALUES (?, ?, ?, ?, ?, ?)',
+      [warrior_name, race_id, warrior_type_id, magic_id, admin_id, warrior_image]
     );
     return result.insertId;
   }
@@ -24,10 +24,10 @@ class WarriorModel {
     return rows;
   }
 
-  static async update(id, { warrior_name, warrior_level, race_id, warrior_type_id, magic_id, admin_id }) {
+  static async update(id, { warrior_name, race_id, warrior_type_id, magic_id, admin_id, warrior_image = null }) {
     const [result] = await connect.query(
-      'UPDATE warrior SET Warrior_name = ?, Warrior_level = ?, Race_id = ?, Warrior_type_id = ?, Magic_id = ?, Admin_id = ?, updated_at = CURRENT_TIMESTAMP WHERE Warrior_id = ?',
-      [warrior_name, warrior_level, race_id, warrior_type_id, magic_id, admin_id, id]
+      'UPDATE warrior SET Warrior_name = ?, Race_id = ?, Warrior_type_id = ?, Magic_id = ?, Admin_id = ?, Warrior_image = ?, updated_at = CURRENT_TIMESTAMP WHERE Warrior_id = ?',
+      [warrior_name, race_id, warrior_type_id, magic_id, admin_id, warrior_image, id]
     );
     return result.affectedRows > 0 ? this.findById(id) : null;
   }
@@ -87,14 +87,5 @@ class WarriorModel {
     );
     return rows;
   }
-
-  static async findByLevelRange(min_level, max_level) {
-    const [rows] = await connect.query(
-      'SELECT * FROM warrior WHERE Warrior_level BETWEEN ? AND ? ORDER BY Warrior_level',
-      [min_level, max_level]
-    );
-    return rows;
-  }
-
 }
 export default WarriorModel; 

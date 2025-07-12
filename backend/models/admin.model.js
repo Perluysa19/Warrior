@@ -2,10 +2,10 @@ import { connect } from '../config/db/connectMysql.js';
 
 class AdminModel {
 
-  static async create({ admin_name, passwordHash }) {
+  static async create({ admin_name, passwordHash, status = 1 }) {
     const [result] = await connect.query(
-      'INSERT INTO admin (Admin_name, Admin_password) VALUES (?, ?)',
-      [admin_name, passwordHash]
+      'INSERT INTO admin (Admin_name, Admin_password, status) VALUES (?, ?, ?)',
+      [admin_name, passwordHash, status]
     );
     return result.insertId;
   }
@@ -24,10 +24,10 @@ class AdminModel {
     return rows;
   }
 
-  static async update(admin_id, { admin_name }) {
+  static async update(admin_id, { admin_name, status }) {
     const [result] = await connect.query(
-      'UPDATE admin SET Admin_name = ?, updated_at = CURRENT_TIMESTAMP WHERE Admin_id = ?',
-      [admin_name, admin_id]
+      'UPDATE admin SET Admin_name = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE Admin_id = ?',
+      [admin_name, status, admin_id]
     );
     return result.affectedRows > 0 ? this.findById(admin_id) : null;
   }
@@ -58,7 +58,7 @@ class AdminModel {
 
   static async findByName(admin_name) {
     const [rows] = await connect.query(
-      'SELECT Admin_id as admin_id, Admin_name as admin_name, Admin_password as admin_password, created_at, updated_at FROM admin WHERE Admin_name = ?',
+      'SELECT Admin_id as admin_id, Admin_name as admin_name, Admin_password as admin_password, status, created_at, updated_at FROM admin WHERE Admin_name = ?',
       [admin_name]
     );
     return rows[0];

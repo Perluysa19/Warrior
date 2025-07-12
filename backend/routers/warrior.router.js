@@ -1,16 +1,18 @@
 import { Router } from "express";
 import WarriorController from '../controllers/warrior.controller.js';
+import warriorImageUpload from '../middleware/warriorImageMiddleware.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 const router = Router();
 const name = '/warrior';
 
-// Rutas públicas
+// Rutas protegidas (solo administradores autenticados)
 router.route(name)
-  .post(WarriorController.register) // Registrar un nuevo guerrero
-  .get(WarriorController.show);     // Mostrar todos los guerreros
+  .post(verifyToken, warriorImageUpload, WarriorController.register) // Registrar un nuevo guerrero
+  .get(verifyToken, WarriorController.show);     // Mostrar todos los guerreros
 
 router.route(`${name}/:id`)
-  .get(WarriorController.findById)  // Mostrar un guerrero por ID
-  .put(WarriorController.update)    // Actualizar un guerrero por ID
-  .delete(WarriorController.delete);// Eliminar un guerrero por ID
+  .get(verifyToken, WarriorController.findById)  // Mostrar un guerrero por ID
+  .put(verifyToken, warriorImageUpload, WarriorController.update)    // Actualizar un guerrero por ID
+  .delete(verifyToken, WarriorController.delete);// Eliminar un guerrero por ID
 
 export default router; 

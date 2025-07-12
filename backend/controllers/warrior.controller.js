@@ -4,41 +4,27 @@ class WarriorController {
 
   async register(req, res) {
     try {
-      const { warrior_name, warrior_level, race_id, warrior_type_id, magic_id, admin_id } = req.body;
-    
-      // Validación básica
-      if (!warrior_name || !warrior_level || !race_id || !warrior_type_id || !admin_id) {
+      if (!req.body) {
+        return res.status(400).json({ error: 'Datos del formulario no recibidos' });
+      }
+      const { warrior_name, race_id, warrior_type_id, magic_id, admin_id } = req.body;
+      const warrior_image = req.file ? req.file.filename : null;
+      if (!warrior_name || !race_id || !warrior_type_id || !admin_id) {
         return res.status(400).json({ error: 'Faltan campos requeridos' });
       }
-
-      // Validación adicional
-      if (warrior_level < 1 || warrior_level > 100) {
-        return res.status(400).json({
-          error: 'El nivel del guerrero debe estar entre 1 y 100'
-        });
-      }
-
-      // Verificar si el guerrero ya existe
       const existingWarrior = await WarriorModel.findByName(warrior_name);
       if (existingWarrior) {
-        return res.status(409).json({
-          error: 'El nombre del guerrero ya está en uso'
-        });
+        return res.status(409).json({ error: 'El nombre del guerrero ya está en uso' });
       }
-
       const warriorId = await WarriorModel.create({
         warrior_name,
-        warrior_level,
         race_id,
         warrior_type_id,
         magic_id,
-        admin_id
+        admin_id,
+        warrior_image
       });
-
-      res.status(201).json({
-        message: 'Guerrero creado exitosamente',
-        id: warriorId
-      });
+      res.status(201).json({ message: 'Guerrero creado exitosamente', id: warriorId });
     } catch (error) {
       console.error('Error en el registro:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
@@ -51,10 +37,7 @@ class WarriorController {
       if (!warriors || warriors.length === 0) {
         return res.status(404).json({ error: 'No hay guerreros registrados' });
       }
-      res.status(200).json({
-        message: 'Guerreros obtenidos exitosamente',
-        data: warriors
-      });
+      res.status(200).json({ message: 'Guerreros obtenidos exitosamente', data: warriors });
     } catch (error) {
       console.error('Error al mostrar guerreros:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
@@ -63,40 +46,28 @@ class WarriorController {
 
   async update(req, res) {
     try {
-      const { warrior_name, warrior_level, race_id, warrior_type_id, magic_id, admin_id } = req.body;
+      if (!req.body) {
+        return res.status(400).json({ error: 'Datos del formulario no recibidos' });
+      }
+      const { warrior_name, race_id, warrior_type_id, magic_id, admin_id } = req.body;
       const id = req.params.id;
-
-      // Validación básica
-      if (!warrior_name || !warrior_level || !race_id || !warrior_type_id || !admin_id || !id) {
+      const warrior_image = req.file ? req.file.filename : null;
+      if (!warrior_name || !race_id || !warrior_type_id || !admin_id || !id) {
         return res.status(400).json({ error: 'Faltan campos requeridos' });
       }
-
-      // Validación adicional
-      if (warrior_level < 1 || warrior_level > 100) {
-        return res.status(400).json({
-          error: 'El nivel del guerrero debe estar entre 1 y 100'
-        });
-      }
-
-      // Verificar si el guerrero existe
       const existingWarrior = await WarriorModel.findById(id);
       if (!existingWarrior) {
         return res.status(404).json({ error: 'El guerrero no existe' });
       }
-
       const updatedWarrior = await WarriorModel.update(id, {
         warrior_name,
-        warrior_level,
         race_id,
         warrior_type_id,
         magic_id,
-        admin_id
+        admin_id,
+        warrior_image
       });
-
-      res.status(200).json({
-        message: 'Guerrero actualizado exitosamente',
-        data: updatedWarrior
-      });
+      res.status(200).json({ message: 'Guerrero actualizado exitosamente', data: updatedWarrior });
     } catch (error) {
       console.error('Error al actualizar guerrero:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
@@ -109,12 +80,8 @@ class WarriorController {
       if (!id) {
         return res.status(400).json({ error: 'Faltan campos requeridos' });
       }
-
       const deletedWarrior = await WarriorModel.delete(id);
-      res.status(200).json({
-        message: 'Guerrero eliminado exitosamente',
-        data: deletedWarrior
-      });
+      res.status(200).json({ message: 'Guerrero eliminado exitosamente', data: deletedWarrior });
     } catch (error) {
       console.error('Error al eliminar guerrero:', error);
       res.status(500).json({ error: 'Error interno del servidor' });
@@ -127,16 +94,11 @@ class WarriorController {
       if (!id) {
         return res.status(400).json({ error: 'Faltan campos requeridos' });
       }
-
       const warrior = await WarriorModel.findById(id);
       if (!warrior) {
         return res.status(404).json({ error: 'El guerrero no existe' });
       }
-
-      res.status(200).json({
-        message: 'Guerrero encontrado exitosamente',
-        data: warrior
-      });
+      res.status(200).json({ message: 'Guerrero encontrado exitosamente', data: warrior });
     } catch (error) {
       console.error('Error al buscar guerrero:', error);
       res.status(500).json({ error: 'Error interno del servidor' });

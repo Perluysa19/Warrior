@@ -17,12 +17,18 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_player` (IN `playerName` 
      INSERT INTO player (Player_name) VALUES (playerName);
    END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_warrior` (IN `warriorName` VARCHAR(30), IN `warriorLevel` INT, IN `raceId` INT, IN `warriorTypeId` INT, IN `magicId` INT, IN `adminId` INT)   BEGIN
-    INSERT INTO warrior (
-      Warrior_name, Warrior_level, Race_id, Warrior_type_id, Magic_id, Admin_id
-    )
-    VALUES (warriorName, warriorLevel, raceId, warriorTypeId, magicId, adminId);
-  END$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_warrior` (
+  IN `warriorName` VARCHAR(30),
+  IN `raceId` INT,
+  IN `warriorTypeId` INT,
+  IN `magicId` INT,
+  IN `adminId` INT
+) BEGIN
+  INSERT INTO warrior (
+    Warrior_name, Race_id, Warrior_type_id, Magic_id, Admin_id
+  )
+  VALUES (warriorName, raceId, warriorTypeId, magicId, adminId);
+END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_player_warriors` (IN `playerId` INT)   BEGIN
     SELECT w.*

@@ -39,12 +39,18 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_player` (IN `playerName` 
      INSERT INTO player (Player_name) VALUES (playerName);
    END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_warrior` (IN `warriorName` VARCHAR(30), IN `warriorLevel` INT, IN `raceId` INT, IN `warriorTypeId` INT, IN `magicId` INT, IN `adminId` INT)   BEGIN
-    INSERT INTO warrior (
-      Warrior_name, Warrior_level, Race_id, Warrior_type_id, Magic_id, Admin_id
-    )
-    VALUES (warriorName, warriorLevel, raceId, warriorTypeId, magicId, adminId);
-  END$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_create_warrior` (
+  IN `warriorName` VARCHAR(30),
+  IN `raceId` INT,
+  IN `warriorTypeId` INT,
+  IN `magicId` INT,
+  IN `adminId` INT
+) BEGIN
+  INSERT INTO warrior (
+    Warrior_name, Race_id, Warrior_type_id, Magic_id, Admin_id
+  )
+  VALUES (warriorName, raceId, warriorTypeId, magicId, adminId);
+END;
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_player_warriors` (IN `playerId` INT)   BEGIN
     SELECT w.*
@@ -86,6 +92,7 @@ CREATE TABLE `admin` (
   `Admin_id` int(11) NOT NULL,
   `Admin_name` varchar(20) NOT NULL,
   `Admin_password` varchar(255) NOT NULL,
+  `status` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -272,274 +279,29 @@ INSERT INTO `race` (`Race_id`, `Race_name`, `Admin_id`, `created_at`, `updated_a
 CREATE TABLE `warrior` (
   `Warrior_id` int(11) NOT NULL,
   `Warrior_name` varchar(30) NOT NULL,
-  `Warrior_level` int(11) NOT NULL,
   `Race_id` int(11) NOT NULL,
   `Warrior_type_id` int(11) NOT NULL,
   `Magic_id` int(11) DEFAULT NULL,
   `Admin_id` int(11) NOT NULL,
+  `Warrior_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`Warrior_id`),
+  KEY `Race_id` (`Race_id`),
+  KEY `Warrior_type_id` (`Warrior_type_id`),
+  KEY `Magic_id` (`Magic_id`),
+  KEY `Admin_id` (`Admin_id`),
+  FOREIGN KEY (`Race_id`) REFERENCES `race` (`Race_id`),
+  FOREIGN KEY (`Warrior_type_id`) REFERENCES `warrior_type` (`Warrior_type_id`),
+  FOREIGN KEY (`Magic_id`) REFERENCES `magic` (`Magic_id`),
+  FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `warrior`
 --
 
-INSERT INTO `warrior` (`Warrior_id`, `Warrior_name`, `Warrior_level`, `Race_id`, `Warrior_type_id`, `Magic_id`, `Admin_id`, `created_at`, `updated_at`) VALUES
-(1, 'Thalor', 10, 1, 1, 1, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Goruk', 5, 2, 2, 2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Aeryn', 8, 3, 3, 3, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `warrior_power`
---
-
-CREATE TABLE `warrior_power` (
-  `Warrior_id` int(11) NOT NULL,
-  `Power_id` int(11) NOT NULL,
-  `Admin_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `warrior_power`
---
-
-INSERT INTO `warrior_power` (`Warrior_id`, `Power_id`, `Admin_id`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(1, 3, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 4, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `warrior_type`
---
-
-CREATE TABLE `warrior_type` (
-  `Warrior_type_id` int(11) NOT NULL,
-  `Warrior_type_name` varchar(30) NOT NULL,
-  `Admin_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `warrior_type`
---
-
-INSERT INTO `warrior_type` (`Warrior_type_id`, `Warrior_type_name`, `Admin_id`, `created_at`, `updated_at`) VALUES
-(1, 'Espadachín', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Arquero', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Mago', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`Admin_id`);
-
---
--- Indices de la tabla `game`
---
-ALTER TABLE `game`
-  ADD PRIMARY KEY (`Game_id`),
-  ADD KEY `Player_id` (`Player_id`);
-
---
--- Indices de la tabla `game_player_warrior`
---
-ALTER TABLE `game_player_warrior`
-  ADD PRIMARY KEY (`Game_id`,`Player_id`,`Warrior_id`),
-  ADD KEY `Player_id` (`Player_id`),
-  ADD KEY `Warrior_id` (`Warrior_id`);
-
---
--- Indices de la tabla `magic`
---
-ALTER TABLE `magic`
-  ADD PRIMARY KEY (`Magic_id`),
-  ADD KEY `Admin_id` (`Admin_id`);
-
---
--- Indices de la tabla `player`
---
-ALTER TABLE `player`
-  ADD PRIMARY KEY (`Player_id`);
-
---
--- Indices de la tabla `player_game`
---
-ALTER TABLE `player_game`
-  ADD PRIMARY KEY (`Game_id`,`Player_id`),
-  ADD KEY `Player_id` (`Player_id`);
-
---
--- Indices de la tabla `power`
---
-ALTER TABLE `power`
-  ADD PRIMARY KEY (`Power_id`),
-  ADD KEY `Admin_id` (`Admin_id`);
-
---
--- Indices de la tabla `race`
---
-ALTER TABLE `race`
-  ADD PRIMARY KEY (`Race_id`),
-  ADD KEY `Admin_id` (`Admin_id`);
-
---
--- Indices de la tabla `warrior`
---
-ALTER TABLE `warrior`
-  ADD PRIMARY KEY (`Warrior_id`),
-  ADD KEY `Race_id` (`Race_id`),
-  ADD KEY `Warrior_type_id` (`Warrior_type_id`),
-  ADD KEY `Magic_id` (`Magic_id`),
-  ADD KEY `Admin_id` (`Admin_id`);
-
---
--- Indices de la tabla `warrior_power`
---
-ALTER TABLE `warrior_power`
-  ADD PRIMARY KEY (`Warrior_id`,`Power_id`),
-  ADD KEY `Power_id` (`Power_id`),
-  ADD KEY `Admin_id` (`Admin_id`);
-
---
--- Indices de la tabla `warrior_type`
---
-ALTER TABLE `warrior_type`
-  ADD PRIMARY KEY (`Warrior_type_id`),
-  ADD KEY `Admin_id` (`Admin_id`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `admin`
---
-ALTER TABLE `admin`
-  MODIFY `Admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT de la tabla `game`
---
-ALTER TABLE `game`
-  MODIFY `Game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `magic`
---
-ALTER TABLE `magic`
-  MODIFY `Magic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `player`
---
-ALTER TABLE `player`
-  MODIFY `Player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `power`
---
-ALTER TABLE `power`
-  MODIFY `Power_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT de la tabla `race`
---
-ALTER TABLE `race`
-  MODIFY `Race_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `warrior`
---
-ALTER TABLE `warrior`
-  MODIFY `Warrior_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT de la tabla `warrior_type`
---
-ALTER TABLE `warrior_type`
-  MODIFY `Warrior_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `game`
---
-ALTER TABLE `game`
-  ADD CONSTRAINT `game_ibfk_1` FOREIGN KEY (`Player_id`) REFERENCES `player` (`Player_id`);
-
---
--- Filtros para la tabla `game_player_warrior`
---
-ALTER TABLE `game_player_warrior`
-  ADD CONSTRAINT `game_player_warrior_ibfk_1` FOREIGN KEY (`Game_id`) REFERENCES `game` (`Game_id`),
-  ADD CONSTRAINT `game_player_warrior_ibfk_2` FOREIGN KEY (`Player_id`) REFERENCES `player` (`Player_id`),
-  ADD CONSTRAINT `game_player_warrior_ibfk_3` FOREIGN KEY (`Warrior_id`) REFERENCES `warrior` (`Warrior_id`);
-
---
--- Filtros para la tabla `magic`
---
-ALTER TABLE `magic`
-  ADD CONSTRAINT `magic_ibfk_1` FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`);
-
---
--- Filtros para la tabla `player_game`
---
-ALTER TABLE `player_game`
-  ADD CONSTRAINT `player_game_ibfk_1` FOREIGN KEY (`Game_id`) REFERENCES `game` (`Game_id`),
-  ADD CONSTRAINT `player_game_ibfk_2` FOREIGN KEY (`Player_id`) REFERENCES `player` (`Player_id`);
-
---
--- Filtros para la tabla `power`
---
-ALTER TABLE `power`
-  ADD CONSTRAINT `power_ibfk_1` FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`);
-
---
--- Filtros para la tabla `race`
---
-ALTER TABLE `race`
-  ADD CONSTRAINT `race_ibfk_1` FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`);
-
---
--- Filtros para la tabla `warrior`
---
-ALTER TABLE `warrior`
-  ADD CONSTRAINT `warrior_ibfk_1` FOREIGN KEY (`Race_id`) REFERENCES `race` (`Race_id`),
-  ADD CONSTRAINT `warrior_ibfk_2` FOREIGN KEY (`Warrior_type_id`) REFERENCES `warrior_type` (`Warrior_type_id`),
-  ADD CONSTRAINT `warrior_ibfk_3` FOREIGN KEY (`Magic_id`) REFERENCES `magic` (`Magic_id`),
-  ADD CONSTRAINT `warrior_ibfk_4` FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`);
-
---
--- Filtros para la tabla `warrior_power`
---
-ALTER TABLE `warrior_power`
-  ADD CONSTRAINT `warrior_power_ibfk_1` FOREIGN KEY (`Warrior_id`) REFERENCES `warrior` (`Warrior_id`),
-  ADD CONSTRAINT `warrior_power_ibfk_2` FOREIGN KEY (`Power_id`) REFERENCES `power` (`Power_id`),
-  ADD CONSTRAINT `warrior_power_ibfk_3` FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`);
-
---
--- Filtros para la tabla `warrior_type`
---
-ALTER TABLE `warrior_type`
-  ADD CONSTRAINT `warrior_type_ibfk_1` FOREIGN KEY (`Admin_id`) REFERENCES `admin` (`Admin_id`);
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+INSERT INTO `warrior` (`Warrior_id`, `Warrior_name`, `Race_id`, `Warrior_type_id`, `Magic_id`, `Admin_id`, `Warrior_image`, `created_at`, `updated_at`) VALUES
+(1, 'Elfo del Bosque', 1, 1, 1, 1, 'elfo.jpg', '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
+(2, 'Orco Bruto', 2, 2, 2, 2, 'orco.jpg', '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
+(3, 'Humano Valiente', 3, 1, 3, 1, 'humano.jpg', '2025-07-07 23:32:53', '2025-07-07 23:32:53');

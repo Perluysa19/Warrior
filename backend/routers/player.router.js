@@ -1,16 +1,18 @@
 import { Router } from "express";
 import PlayerController from '../controllers/player.controller.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 const router = Router();
 const name = '/player';
 
-// Rutas públicas
-router.route(name)
-  .post(PlayerController.register) // Registrar un nuevo jugador
-  .get(PlayerController.show);     // Mostrar todos los jugadores
+// Ruta pública para registro de jugadores (login)
+router.post(name, PlayerController.register); // Registrar un nuevo jugador (público)
+
+// Rutas protegidas (solo administradores autenticados)
+router.get(name, verifyToken, PlayerController.show);     // Mostrar todos los jugadores
 
 router.route(`${name}/:id`)
-  .get(PlayerController.findById)  // Mostrar un jugador por ID
-  .put(PlayerController.update)    // Actualizar un jugador por ID
-  .delete(PlayerController.delete);// Eliminar un jugador por ID
+  .get(verifyToken, PlayerController.findById)  // Mostrar un jugador por ID
+  .put(verifyToken, PlayerController.update)    // Actualizar un jugador por ID
+  .delete(verifyToken, PlayerController.delete);// Eliminar un jugador por ID
 
 export default router; 

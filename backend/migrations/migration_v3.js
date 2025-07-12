@@ -42,6 +42,7 @@ const sqlStatements = [
     Admin_id int(11) NOT NULL,
     Admin_name varchar(20) NOT NULL,
     Admin_password varchar(255) NOT NULL,
+    status TINYINT(1) NOT NULL DEFAULT 1,
     created_at timestamp NOT NULL DEFAULT current_timestamp(),
     updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY (Admin_id)
@@ -158,79 +159,7 @@ const sqlStatements = [
     FOREIGN KEY (Warrior_id) REFERENCES warrior (Warrior_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci`,
 
-  `CREATE TABLE warrior_power (
-    Warrior_id int(11) NOT NULL,
-    Power_id int(11) NOT NULL,
-    Admin_id int(11) NOT NULL,
-    created_at timestamp NOT NULL DEFAULT current_timestamp(),
-    updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-    PRIMARY KEY (Warrior_id, Power_id),
-    KEY Power_id (Power_id),
-    KEY Admin_id (Admin_id),
-    FOREIGN KEY (Warrior_id) REFERENCES warrior (Warrior_id),
-    FOREIGN KEY (Power_id) REFERENCES power (Power_id),
-    FOREIGN KEY (Admin_id) REFERENCES admin (Admin_id)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci`,
-
-  // Insert initial data
-  `INSERT INTO admin (Admin_id, Admin_name, Admin_password, created_at, updated_at) VALUES
-(1, 'Carlos111', '$2b$10$0ROz/1rHbBSA5', '2025-07-07 23:32:53', '2025-07-08 00:24:23'),
-(2, 'Carlos', 'admin123', '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(4, 'test_admin_qa', '$2b$10$TzL9eGLpXFILz', '2025-07-07 23:44:14', '2025-07-07 23:44:14'),
-(5, 'Luisa_pereira', '$2b$10$ZuwdzYJ.F0Hfq', '2025-07-08 00:23:55', '2025-07-08 00:23:55')`,
-
-  `INSERT INTO player (Player_id, Player_name, created_at, updated_at) VALUES
-(1, 'Luisanys', '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Daniel', '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Camila', '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO game (Game_id, Game_name, Game_Public, Game_Code, Player_id, created_at, updated_at) VALUES
-(1, 'Batalla del Norte', 1, 'ABC123', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Guerra de los Reinos', 0, 'XYZ789', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO magic (Magic_id, Magic_type, Admin_id, created_at, updated_at) VALUES
-(1, 'Fuego', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Hielo', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Electricidad', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO power (Power_id, Power_name, Admin_id, created_at, updated_at) VALUES
-(1, 'Ataque rápido', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Invisibilidad', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Curación', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(4, 'Teleportación', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO race (Race_id, Race_name, Admin_id, created_at, updated_at) VALUES
-(1, 'Elfo', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Orco', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Humano', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO warrior_type (Warrior_type_id, Warrior_type_name, Admin_id, created_at, updated_at) VALUES
-(1, 'Espadachín', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Arquero', 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Mago', 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO warrior (Warrior_id, Warrior_name, Warrior_level, Race_id, Warrior_type_id, Magic_id, Admin_id, created_at, updated_at) VALUES
-(1, 'Thalor', 10, 1, 1, 1, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 'Goruk', 5, 2, 2, 2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 'Aeryn', 8, 3, 3, 3, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO player_game (Game_id, Player_id, created_at, updated_at) VALUES
-(1, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(1, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 3, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO game_player_warrior (Game_id, Player_id, Warrior_id, created_at, updated_at) VALUES
-(1, 1, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(1, 2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 3, 3, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
-
-  `INSERT INTO warrior_power (Warrior_id, Power_id, Admin_id, created_at, updated_at) VALUES
-(1, 1, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(1, 3, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(2, 2, 2, '2025-07-07 23:32:53', '2025-07-07 23:32:53'),
-(3, 4, 1, '2025-07-07 23:32:53', '2025-07-07 23:32:53')`,
+  // Eliminado DROP, CREATE, INSERT y PROCEDURE de warrior_power
 
   // Set AUTO_INCREMENT values
   `ALTER TABLE admin MODIFY Admin_id int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6`,

@@ -91,12 +91,20 @@ class AdminController {
       if (!id) {
         return res.status(400).json({ error: 'Required fields are missing' });
       }
-      // Verify if the Admin already exists
-      const deleteAdminModel = await AdminModel.delete(id);
-      res.status(201).json({
-        message: 'Admin deleted successfully',
-        data: deleteAdminModel
-      });
+      // Intentar borrar el admin
+      try {
+        const deleteAdminModel = await AdminModel.delete(id);
+        res.status(201).json({
+          message: 'Admin deleted successfully',
+          data: deleteAdminModel
+        });
+      } catch (err) {
+        // Error de clave foránea
+        if (err && err.code === 'ER_ROW_IS_REFERENCED_2') {
+          return res.status(409).json({ error: 'No se puede eliminar el administrador porque está relacionado con otros registros.' });
+        }
+        throw err;
+      }
     } catch (error) {
       console.error('Error in delete:', error);
       res.status(500).json({ error: 'Internal Server Error' });
